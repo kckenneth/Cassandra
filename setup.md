@@ -162,10 +162,10 @@ Use HELP for help.
 ```
 If so, quit by `ctrl+d` or `exit`
 
-
+---------------
 
 # 1. Compile the scala app
-Now you have all the script, you first compile the script. This will generate `project` and `target` directories in your current folder. So everytime you make changes in the scala script, you need to recompile it again. 
+Now you have all the scripts, you first compile the script. This will generate `project` and `target` directories in your current folder. So everytime you make changes in the scala script, you need to recompile it again. 
 ```
 $ sbt clean package
 ```
@@ -179,6 +179,8 @@ $ find . -iname "*.jar"
 ```
 # 2. Stream the tweets !
 
+You must have started cassandra before. If you haven't, go and start by `$ /etc/init.d/cassandra start`. 
+
 You need 3 flags when you `spark-submit`.   
 --master  
 --packages  
@@ -189,17 +191,18 @@ You need 3 flags when you `spark-submit`.
 ```
 $SPARK_HOME/bin/spark-submit --master spark://spark1:7077  --packages org.apache.bahir:spark-streaming-twitter_2.11:2.1.0,com.datastax.spark:spark-cassandra-connector_2.11:2.0.3  --class TweatEat $(find target -iname "*.jar") 
 ```
+This will generate all the tweet process. Once it's done, go to CQL as follow. 
 
+# 3. Tweet in CQL Cassandra
 
-
-
-
-
-
-
+In our `tweeteat.scala` script, we specified `.saveToCassandra("streaming", "tweetdata", SomeColumns("id", "author", "tweet"))`, so this creates a spacekey: `streaming` and a table: `tweetdata`. 
 
 ```
+$ cqlsh
 cqlsh> select * from streaming.tweetdata;
+
+...
+...
 
  id                  | author          | tweet
 ---------------------+-----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
