@@ -118,14 +118,30 @@ object TweatEat  extends App {
 case class TweetData(id: Long, author: String, tweet: String)
 ```
 --------------
-# Run the app
+# 1. Compile the scala app
 Now you have all the script, you first compile the script. This will generate `project` and `target` directories in your current folder. So everytime you make changes in the scala script, you need to recompile it again. 
 ```
 $ sbt clean package
 ```
 
 #### Note
-If you want to compile and run the program, you can also do by `$ sbt package run`. However this will create an error because you'd need to provide the spark node information. 
+If you want to compile and run the program immediately, you can also do so by `$ sbt package run`. However this will create an error because you'd need to provide the spark node information. So we will compile and run the program separately. 
+
+Now that two directories are created: `project` and `target`, the java file we need when we stream the tweets into our spark is in the `target` directory. You can double check by 
+```
+$ find . -iname "*.jar"
+```
+# 2. Stream the tweets !
+
+You need 3 flags:  
+--master 
+--packages  
+--class
+
+```
+$SPARK_HOME/bin/spark-submit --master spark://spark1:7077  --packages org.apache.bahir:spark-streaming-twitter_2.11:2.1.0,com.datastax.spark:spark-cassandra-connector_2.11:2.0.3  --class TweatEat $(find target -iname "*.jar") 
+```
+
 
 
 
