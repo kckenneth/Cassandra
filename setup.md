@@ -118,6 +118,52 @@ object TweatEat  extends App {
 case class TweetData(id: Long, author: String, tweet: String)
 ```
 --------------
+# Cassandra setup
+
+Since you're going to stream tweets, you need to setup Cassandra which will process your tweet data on the fly. Basically, every tweet will be stored in Cassandra where we can create a table (noSQL), customize the columns and such. So every tweets information will be stored in Cassandra noSQL table. When we're done with the streaming, we can launch Cassandra noSQL and process our tweet data. We will setup the Cassandra as follow. 
+
+Create a script `datastax.repo` in the following directory. 
+
+```
+vi /etc/yum.repos.d/datastax.repo`
+```
+Copy and paste the code below
+```
+[datastax]
+name = DataStax Repo for Apache Cassandra
+baseurl = http://rpm.datastax.com/community
+enabled = 1
+gpgcheck = 0
+```
+
+## Install Cassandra database
+You'd probably remember, we are now in CentOS, so our intallation command is `yum`, not `apt-get` in Ubuntu. 
+```
+$ yum -y install dsc20
+```
+
+## Start Cassandra
+Use either of the commands to start cassandra. 
+```
+$ systemctl start cassandra
+```
+Or
+```
+/etc/init.d/cassandra start
+```
+## Check Cassandra
+Check if the cassandra is already started. 
+```
+$ cqlsh
+
+Connected to Test Cluster at localhost:9160.
+[cqlsh 4.1.1 | Cassandra 2.0.17 | CQL spec 3.1.1 | Thrift protocol 19.39.0]
+Use HELP for help.
+```
+If so, quit by `ctrl+d` or `exit`
+
+
+
 # 1. Compile the scala app
 Now you have all the script, you first compile the script. This will generate `project` and `target` directories in your current folder. So everytime you make changes in the scala script, you need to recompile it again. 
 ```
@@ -133,10 +179,12 @@ $ find . -iname "*.jar"
 ```
 # 2. Stream the tweets !
 
-You need 3 flags:  
---master 
+You need 3 flags when you `spark-submit`.   
+--master  
 --packages  
 --class
+
+`--class` flag, you specificy the class object from your `tweeteat.scala` script. It's from `object TweatEat  extends App {`. 
 
 ```
 $SPARK_HOME/bin/spark-submit --master spark://spark1:7077  --packages org.apache.bahir:spark-streaming-twitter_2.11:2.1.0,com.datastax.spark:spark-cassandra-connector_2.11:2.0.3  --class TweatEat $(find target -iname "*.jar") 
