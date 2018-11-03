@@ -1,4 +1,4 @@
-|Title |  Spark Installation |
+|Title |  Scala, Cassanda Installation |
 |-----------|----------------------------------|
 |Author | Kenneth Chen |
 |Utility | Spark, Cassandra, Twitter |
