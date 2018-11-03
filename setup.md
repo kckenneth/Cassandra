@@ -22,7 +22,7 @@ val ssc = new StreamingContext(sc, Seconds(1))
 # Spark setup
 
 Please go to setup in details. 
-<http>https://raw.githubusercontent.com/kckenneth/Spark/master/setup.md</http>
+<a href=https://raw.githubusercontent.com/kckenneth/Spark/master/setup.md>setup</a>
 
 
 
