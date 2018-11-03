@@ -43,7 +43,7 @@ $ mkdir /root/tweeteat
 $ cd /root/tweeteat
 ```
 
-### 1. build.sbt
+## 1. build.sbt
 
 In the `/root/tweeteat/` directory, you need to creat the `build.sbt` script. 
 ```
@@ -63,9 +63,9 @@ resolvers += "Akka Repository" at "http://repo.akka.io/releases/"
 ```
 Spark version we installed earlier was `2.1.1`. 
 
-### 2. tweeteat.scala
+## 2. tweeteat.scala
 
-In the same directory `/root/tweeteat/` you need to create `tweeteat.scala` script. This script is the main scala script. Twitter 4 APIs are required. I removed the last 5 characters here for each of those for security. 
+In the same directory `/root/tweeteat/` you need to create `tweeteat.scala` script. This script is the main scala script. Just create the script as in `$ vi tweeteat.scala`. Twitter 4 APIs are required. I removed the last 5 characters here for each of those for security. 
 
 ```
 import org.apache.spark.streaming.Seconds
@@ -117,6 +117,16 @@ object TweatEat  extends App {
 
 case class TweetData(id: Long, author: String, tweet: String)
 ```
+--------------
+# Run the app
+Now you have all the script, you first compile the script. This will generate `project` and `target` directories in your current folder. So everytime you make changes in the scala script, you need to recompile it again. 
+```
+$ sbt clean package
+```
+
+#### Note
+If you want to compile and run the program, you can also do by `$ sbt package run`. However this will create an error because you'd need to provide the spark node information. 
+
 
 
 
