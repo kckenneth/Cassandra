@@ -21,8 +21,9 @@ val ssc = new StreamingContext(sc, Seconds(1))
 ```
 # Spark setup
 
-Please go to setup in details. 
-<a href=https://raw.githubusercontent.com/kckenneth/Spark/master/setup.md>setup</a>
+Please go to <a href=https://github.com/kckenneth/Spark/blob/master/setup.md>setup</a> for detailed description. 
+
+
 
 
 
