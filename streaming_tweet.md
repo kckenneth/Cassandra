@@ -206,5 +206,12 @@ Top 3 hashtags in last 10 seconds (27 total):
      Mentions (1): WarriorofGod97
 ```
 
+## Cassandra
+You can also go to Cassandra and check the table. 
+```
+$ cqlsh
+$ select * from streaming.tweetdata;
+```
+
      
 
