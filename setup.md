@@ -216,6 +216,12 @@ cqlsh> select * from streaming.tweetdata;
  1058815675991576586 |    FernandoPL21 |                                                                                                                                                                                                                                       Las mejores amistades😌🎃
 ```
 
+### To clear the table
+
+```
+cqlsh> truncate streaming.tweetdata;
+```
+
 
 
 
