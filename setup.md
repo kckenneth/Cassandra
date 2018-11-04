@@ -125,7 +125,7 @@ Since you're going to stream tweets, you need to setup Cassandra which will proc
 Create a script `datastax.repo` in the following directory. 
 
 ```
-vi /etc/yum.repos.d/datastax.repo`
+vi /etc/yum.repos.d/datastax.repo
 ```
 Copy and paste the code below
 ```
