@@ -1,6 +1,10 @@
 # Streaming Tweet and Processing
 
-In this exercise, we're going to stream Tweeet with parameters such as total duration (TotD), Interval (Intv), Top most occurring hashtags (TopHT), and filters words (Flts) 
+In this exercise, we're going to stream Tweeet with parameters such as 
+1. total duration (TotD), 
+2. Interval (Intv), 
+3. Top most occurring hashtags (TopHT), and 
+4. filters words (Flts) 
 
 
 
