@@ -75,7 +75,7 @@ object Main extends App {
         })
         
     // start consuming stream
-    ssc.start
+    ssc.start()
     ssc.awaitTerminationOrTimeout(Intv * 1000)
     ssc.stop(true, true)
 
