@@ -1,3 +1,9 @@
+# Architecture
+
+<p align="center">
+<img src="img/cassandra.png" width="600"></p>
+<p align="center">Figure 1. Cassandra Architecture</p>
+
 # Execution steps
 
 ```
