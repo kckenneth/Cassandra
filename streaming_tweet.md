@@ -104,26 +104,24 @@ object Main extends App {
     // extract desired data from each status during sample period as class "TweetData", store collection of those in new RDD
     stream.map(status => TweetData(status.getId, status.getUser.getScreenName, status.getText.trim)).saveToCassandra("streaming", "tweetdata", SomeColumns("id", "author", "tweet"))
  
-    // Split the tweet into 3 separate informations: hashtags, user and mentions. 
-    val hashKeyVal = stream.map(tweet => {
+    // Split the tweet into 3 separate informations: hashtags, user and mentions, create in a tuple, and flatmap
+    val hash_usr_men = stream.map(tweet => {
         val hashtags = tweet.getText().split(" ").filter(word => word.startsWith("#"))
         val authors  = tweet.getUser.getScreenName()
-        val mentions = tweet.getUserMentionEntities().map(_.getScreenName).toArray
-        (hashtags, Set(authors), mentions)})
-        .flatMap(tup => tup._1.map(hashtag => (hashtag, (1, tup._2, tup._3))))
+        val mentions = tweet.getUserMentionEntities().map(_.getScreenName)
+        .toArray(hashtags, Set(authors), mentions)})
+        .flatMap(tupl => tupl._1.map(hashtag => (hashtag, (1, tupl._2, tupl._3))))
         
     // Reduce by counting the hashtags and sort by the count 
-    val hashSortedCnt = hashKeyVal
-                     .reduceByKeyAndWindow({case (x, y) =>
-                                   (x._1 + y._1, x._2 ++ y._2, x._3 ++ y._3)}, Seconds(winDur))
+    val hash_sorted = hash_usr_men
+                     .reduceByKeyAndWindow({case (x, y) => (x._1 + y._1, x._2 ++ y._2, x._3 ++ y._3)}, Seconds(Intv))
                      .transform(_.sortBy({case (_, (count, _, _)) => count}, ascending = false))
                      
     // Take top N hashtags and print results       
-    hashSortedCnt.foreachRDD( rdd => {
-        var topHashes = rdd.take(topN)
+    hash_sorted.foreachRDD( rdd => {var topHashes = rdd.take(TpHT)
         println("\n")
         println(format.format(Calendar.getInstance().getTime()))
-        println("Top %d hashtags in last %d seconds (%s total):".format(topN, winDur, rdd.count()))
+        println("Top %d hashtags in last %d seconds (%s total):".format(TpHT, Intv, rdd.count()))
         topHashes.foreach{ case (tag, (cnt,users,mentions)) =>
                       println("  %s (%s tweets)".format(tag, cnt))
                       println("     Users (%s):    %s".format(users.size, users.mkString(",")))
@@ -133,7 +131,7 @@ object Main extends App {
         
     // start consuming stream
     ssc.start
-    ssc.awaitTerminationOrTimeout(winDur * 1000)
+    ssc.awaitTerminationOrTimeout(Intv * 1000)
     ssc.stop(true, true)
 
     println(s"============ Exiting ================")
