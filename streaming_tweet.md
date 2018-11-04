@@ -113,8 +113,8 @@ object Main extends App {
     val hash_usr_men = stream.map(tweet => {
         val hashtags = tweet.getText().split(" ").filter(word => word.startsWith("#"))
         val authors  = tweet.getUser.getScreenName()
-        val mentions = tweet.getUserMentionEntities().map(_.getScreenName)
-        .toArray(hashtags, Set(authors), mentions)})
+        val mentions = tweet.getUserMentionEntities().map(_.getScreenName).toArray
+        (hashtags, Set(authors), mentions)})
         .flatMap(tupl => tupl._1.map(hashtag => (hashtag, (1, tupl._2, tupl._3))))
         
     // Reduce by counting the hashtags and sort by the count 
