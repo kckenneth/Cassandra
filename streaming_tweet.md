@@ -54,6 +54,11 @@ Our spark version is `2.1.1`. I also added cassandra and typeface to be on the s
 
 ### twitter_popularity.scala
 ```
+$ vi twitter_popularity.scala
+```
+copy and paste the following
+
+```
 import org.apache.spark.streaming.Seconds
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.StreamingContext._
