@@ -3,7 +3,7 @@
 In this exercise, we're going to stream Tweeet with parameters such as 
 1. total duration (TotD), 
 2. Interval (Intv), 
-3. Top most occurring hashtags (TopHT), and 
+3. Top most occurring hashtags (TpHT), and 
 4. filters words (Flts) 
 
 # Making less verbose in spark-submit
@@ -31,7 +31,7 @@ The directory will look like this.
 ├── build.sbt
 └── twitter_popularity.scala
 ```
-## build.sbt
+### build.sbt
 ```
 $ mkdir /root/twitter_popularity
 $ cd /root/twitter_popularity
@@ -52,7 +52,7 @@ resolvers += "Akka Repository" at "http://repo.akka.io/releases"
 ```
 Our spark version is `2.1.1`. I also added cassandra and typeface to be on the safe side. 
 
-## twitter_popularity.scala
+### twitter_popularity.scala
 ```
 import org.apache.spark.streaming.Seconds
 import org.apache.spark.streaming.StreamingContext
@@ -76,48 +76,35 @@ import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-
-
 object Main extends App {
     println(s"\nI got executed with ${args size} args, they are: ${args mkString ", "}\n")
 
-  // your code goes here
-  // get user input for batch duration, window duration, top n hashtags, and filters
-    val batchDur = args(0).toInt  //batch duration
-    val winDur = args(1).toInt    //aggregation window duration
-    val topN = args(2).toInt
-    val filters = args.takeRight(args.length - 3)
+    // your code goes here
+    // get user input for total duration, interval, number of top hashtags, and filter words (optional)
+    val TotD = args(0).toInt  
+    val Intv = args(1).toInt    
+    val TpHT = args(2).toInt
+    val Flts = args.takeRight(args.length - 3)
 
     val format = new SimpleDateFormat("HH:mm:ss")
-
-    println("Input: {batch : %d, win : %d, topN:%d}".format(batchDur, winDur,topN))
-
-    // Twitter4j library was configured to generate OAuth credentials
-    //val propPrefix = "twitter4j.oauth."
-    //System.setProperty(s"${propPrefix}consumerKey", "ccwtl2crmKH0p30pHocmcvouh")
-    //System.setProperty(s"${propPrefix}consumerSecret", "gMjli4yVo2Bf3kM3ejHez1vDtB5AqK7r2HTqk9pvx9GNEF7F9n")
-    //System.setProperty(s"${propPrefix}accessToken", "1414214346-SIvjGchjh09A6r3YIZzTNSaj0LOBF3kqJL6syrW")
-    //System.setProperty(s"${propPrefix}accessTokenSecret", "2EHxskNPxczHxsjmrqiA1C1peydSjNxf9kHiwPqwSUqZ0")
     
-    System.setProperty("twitter4j.oauth.consumerKey", "Mfkzw1lvN1TOoe2pCXiDFcQSP")
-    System.setProperty("twitter4j.oauth.consumerSecret", "NNoVeO4zvozhIXDRvsvuLgr0XYPEcqX3ZGNbGfwYGE38HhQEud")
-    System.setProperty("twitter4j.oauth.accessToken", "989972665686470657-tgMO3BBMrduV5dJt7sNWWp2xmTRqitC")
-    System.setProperty("twitter4j.oauth.accessTokenSecret", "dDl8jlHDdeYm2GO60MZpZjLlzdNPFWTVBk05zUgmb6otR")
+    System.setProperty("twitter4j.oauth.consumerKey", "Mfkzw1lvN1TOoe2pCXiDxxxxx")
+    System.setProperty("twitter4j.oauth.consumerSecret", "NNoVeO4zvozhIXDRvsvuLgr0XYPEcqX3ZGNbGfwYGE38Hxxxxx")
+    System.setProperty("twitter4j.oauth.accessToken", "989972665686470657-tgMO3BBMrduV5dJt7sNWWp2xmTxxxxx")
+    System.setProperty("twitter4j.oauth.accessTokenSecret", "dDl8jlHDdeYm2GO60MZpZjLlzdNPFWTVBk05zUgmxxxxx")
     
     val sparkConf = new SparkConf()
         .setAppName("mids tweeteat")
         .set("spark.cassandra.connection.host", "127.0.0.1")
         .set("spark.cassandra.connection.connections_per_executor_max", "2");
         
-    //val sparkConf = new SparkConf().setAppName("TwitterPopularTags")
-    val ssc = new StreamingContext(sparkConf, Seconds(batchDur))
-    val stream = TwitterUtils.createStream(ssc, None, filters)
-    println(s"This is stream {%s}".format(stream)) 
+    val ssc = new StreamingContext(sparkConf, Seconds(TotD))
+    val stream = TwitterUtils.createStream(ssc, None, Flts)
 
     // extract desired data from each status during sample period as class "TweetData", store collection of those in new RDD
-    val tweetData = stream.map(status => TweetData(status.getId, status.getUser.getScreenName, status.getText.trim)).saveToCassandra("streaming", "tweetdata", SomeColumns("id", "author", "tweet"))
-    //tweetData.foreachRDD(rdd => {println(s"A sample of tweets I gathered over ${batchDur}s: ${rdd.take(10).mkString(" ")} (total tweets fetched: ${rdd.count()})")})
-    
+    stream.map(status => TweetData(status.getId, status.getUser.getScreenName, status.getText.trim)).saveToCassandra("streaming", "tweetdata", SomeColumns("id", "author", "tweet"))
+ 
+    // Split the tweet into 3 separate informations: hashtags, user and mentions. 
     val hashKeyVal = stream.map(tweet => {
         val hashtags = tweet.getText().split(" ").filter(word => word.startsWith("#"))
         val authors  = tweet.getUser.getScreenName()
@@ -125,8 +112,7 @@ object Main extends App {
         (hashtags, Set(authors), mentions)})
         .flatMap(tup => tup._1.map(hashtag => (hashtag, (1, tup._2, tup._3))))
         
-    // Reduce by counting hashtag occurances and creating a set of users and mentions
-    // Then sort by count
+    // Reduce by counting the hashtags and sort by the count 
     val hashSortedCnt = hashKeyVal
                      .reduceByKeyAndWindow({case (x, y) =>
                                    (x._1 + y._1, x._2 ++ y._2, x._3 ++ y._3)}, Seconds(winDur))
@@ -155,9 +141,6 @@ object Main extends App {
 }
 
 case class TweetData(id: Long, author: String, tweet: String)
-
-
-
 ```
 
 
@@ -173,3 +156,52 @@ The directory will look like this after compiling the scala.
 ├── target
 └── twitter_popularity.scala
 ```
+
+# Stream the Tweet !
+We will stream the tweet for 30 seconds with 10 second intervals process. Top 3 hashtags will be listed. 
+```
+$SPARK_HOME/bin/spark-submit --master spark://spark1:7077  --packages org.apache.bahir:spark-streaming-twitter_2.11:2.1.0,com.datastax.spark:spark-cassandra-connector_2.11:2.0.3  --class Main $(find target -iname "*.jar") 10 30 3 
+```
+Output  
+Since we are processing every 10 seconds for 30 seconds in total, there will be 3 outputs. Each output has top 3 hashtags. 
+```
+14:29:51
+Top 3 hashtags in last 10 seconds (22 total):
+  #MTVEMA (2 tweets)
+     Users (2):    Anxiety__ridden,toxicskylie
+     Mentions (1): panicupdating
+  #MAGA (1 tweets)
+     Users (1):    yeojinakgae
+     Mentions (1): likeysIut
+  #السعودية_كوريا_الجنوبية
+ (1 tweets)
+     Users (1):    BandarKhalid_10
+     Mentions (1): hamadfahadhh
+
+14:30:05
+Top 3 hashtags in last 10 seconds (49 total):
+  #MTVEMA (2 tweets)
+     Users (2):    Anxiety__ridden,toxicskylie
+     Mentions (1): panicupdating
+  #MAGA (1 tweets)
+     Users (1):    yeojinakgae
+     Mentions (1): likeysIut
+  #HauntingOfHillHouse (1 tweets)
+     Users (1):    SuperSuperNico
+     Mentions (1): nexuspong
+ 
+14:30:06
+Top 3 hashtags in last 10 seconds (27 total):
+  #ElectionDay (1 tweets)
+     Users (1):    johnnywandermer
+     Mentions (1): Lola15363615
+  #RealSociedadSevillaFC (1 tweets)
+     Users (1):    RealSociedadEUS
+     Mentions (0): 
+  #HotTicketCandidates (1 tweets)
+     Users (1):    deanbc1
+     Mentions (1): WarriorofGod97
+```
+
+     
+
