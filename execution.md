@@ -19,5 +19,5 @@ $SPARK_HOME/bin/spark-submit --master spark://spark1:7077  --packages org.apache
 
 1. <a href=https://github.com/kckenneth/Cassandra/blob/master/setup.md>How to setup spark, cassandra</a>
 2. <a href=https://github.com/kckenneth/Cassandra/blob/master/streaming_tweet.md>Streaming Tweet</a> 
-3. Execution 
+3. <a href=https://github.com/kckenneth/Cassandra/blob/master/execution.md>Execution</a>
 
