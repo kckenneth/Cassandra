@@ -27,3 +27,7 @@ $SPARK_HOME/bin/spark-submit --master spark://spark1:7077  --packages org.apache
 2. <a href=https://github.com/kckenneth/Cassandra/blob/master/streaming_tweet.md>Streaming Tweet</a> 
 3. <a href=https://github.com/kckenneth/Cassandra/blob/master/execution.md>Execution</a>
 
+# Interesting Facts
+
+Verbosity of log in spark-submit can be removed in conf directory. Since scala is a functional programming language, each input can be processed by `map`, `flatmap` to cater to our needs. 
+
