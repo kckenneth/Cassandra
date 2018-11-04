@@ -123,7 +123,8 @@ object Main extends App {
                      .transform(_.sortBy({case (_, (count, _, _)) => count}, ascending = false))
                      
     // Take top N hashtags and print results       
-    hash_sorted.foreachRDD( rdd => {var topHashes = rdd.take(TpHT)
+    hash_sorted.foreachRDD( rdd => {
+        var topHashes = rdd.take(TpHT)
         println("\n")
         println(format.format(Calendar.getInstance().getTime()))
         println("Top %d hashtags in last %d seconds (%s total):".format(TpHT, Intv, rdd.count()))
