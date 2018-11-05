@@ -46,7 +46,6 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "2.1.1"
 libraryDependencies += "org.apache.spark" % "spark-streaming_2.11" % "2.1.1"
 libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % "2.1.1"
 libraryDependencies += "org.apache.bahir" %% "spark-streaming-twitter" % "2.1.1"
-libraryDependencies += "com.datastax.spark" %% "spark-cassandra-connector" % "2.0.3"
 libraryDependencies += "com.typesafe" % "config" % "1.3.0"
 resolvers += "Akka Repository" at "http://repo.akka.io/releases"
 ```
@@ -70,9 +69,6 @@ import org.apache.spark.streaming.twitter._
 
 import org.apache.spark._
 import org.apache.spark.streaming._
-
-import com.datastax.spark.connector.streaming._
-import com.datastax.spark.connector.SomeColumns
 
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Config
@@ -136,7 +132,7 @@ object Main extends App {
         })
         
     // start consuming stream
-    ssc.start
+    ssc.start()
     ssc.awaitTerminationOrTimeout(Intv * 1000)
     ssc.stop(true, true)
 
