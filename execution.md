@@ -8,6 +8,7 @@
 
 ```
 $ ssh root@50.97.252.101
+# cd /root/twitter_popularity
 ```
 
 Enter the password. 
