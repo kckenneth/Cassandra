@@ -103,7 +103,8 @@ object Main extends App {
     val stream = TwitterUtils.createStream(ssc, None, Flts)
 
     // extract desired data from each status during sample period as class "TweetData", store collection of those in new RDD
-    stream.map(status => TweetData(status.getId, status.getUser.getScreenName, status.getText.trim)).saveToCassandra("streaming", "tweetdata", SomeColumns("id", "author", "tweet"))
+    // I commented the code below because of the cassandra problem with a huge data
+    //stream.map(status => TweetData(status.getId, status.getUser.getScreenName, status.getText.trim)).saveToCassandra("streaming", "tweetdata", SomeColumns("id", "author", "tweet"))
  
     // Split the tweet into 3 separate informations: hashtags, user and mentions, create in a tuple, and flatmap
     val hash_usr_men = stream.map(tweet => {
@@ -204,11 +205,24 @@ Top 3 hashtags in last 10 seconds (27 total):
 ```
 
 ## Cassandra
-You can also go to Cassandra and check the table. 
+You can also go to Cassandra and check the table. I first used the cassandra to store the tweet in a table. However it becomes too big after I run several times, it stops working and connection becomes a failure with `rpc timeout`. But initially this is how I access the table after I stream the tweet. 
 ```
 $ cqlsh
 $ select * from streaming.tweetdata;
 ```
+To troubleshoot the timeout problem, I went to
+```
+$ vi /etc/cassandra/cassandra-env.sh
+/JVM_OPTS="$JVM_OPTS -Djava.rmi.server.hostname=
+```
+replace `<public name>` with `127.0.0.1` and uncomment the line by removing the `#`. 
+```
+$ systemctl restart cassandra.service
+$ systemctl status cassandra.service
+$ systemctl start cassandra.service
+```
+
+
 
      
 
