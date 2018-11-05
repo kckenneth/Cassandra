@@ -8,7 +8,6 @@
 
 ```
 $ ssh root@50.97.252.101
-# cd /root/twitter_popularity
 ```
 
 Enter the password. 
@@ -19,7 +18,8 @@ spark-submit with
 - 5 top hashtags 
 
 ```
-$SPARK_HOME/bin/spark-submit --master spark://spark1:7077  --packages org.apache.bahir:spark-streaming-twitter_2.11:2.1.0,com.datastax.spark:spark-cassandra-connector_2.11:2.0.3  --class Main $(find target -iname "*.jar") 10 60 5
+# cd /root/twitter_popularity
+# $SPARK_HOME/bin/spark-submit --master spark://spark1:7077  --packages org.apache.bahir:spark-streaming-twitter_2.11:2.1.0,com.datastax.spark:spark-cassandra-connector_2.11:2.0.3  --class Main $(find target -iname "*.jar") 10 60 5
 ```
 
 # Sample output
